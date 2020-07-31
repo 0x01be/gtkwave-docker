@@ -12,32 +12,35 @@ RUN apk add --no-cache --virtual build-dependencies \
     tk-dev \
     gperf \
     xz-dev \
-    gtk+2.0-dev
+    gtk+3.0-dev
 
 RUN git clone --depth=1 https://github.com/gtkwave/gtkwave /gtkwave
 
-WORKDIR /gtkwave/gtkwave3
+WORKDIR /gtkwave/gtkwave3-gtk3
 
 RUN ./autogen.sh
 
-RUN ./configure --prefix=/opt/gtkwave/
+RUN ./configure --prefix=/opt/gtkwave/ --enable-gtk3
 RUN make
 RUN make install
 
-FROM alpine:3.12.0
+FROM 0x01be/xpra
 
 COPY --from=builder /opt/gtkwave/ /opt/gtkwave/
 
-RUN apk add --no-cache --virtual build-dependencies \
+RUN apk add --no-cache --virtual gtkwave-runtime-dependencies \
     --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
     --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
-    gtk+2.0 \
-    xf86-video-dummy \
-    xorg-server
-
-COPY ./xorg.conf /xorg.conf
-#Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile ./0.log -config ./xorg.conf :0
-#ENV DISPLAY :0
+    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+    tcl \
+    tk \
+    gtk+3.0 \
+    ttf-freefont \
+    gnome-icon-theme
 
 ENV PATH $PATH:/opt/gtkwave/bin/
+
+EXPOSE 10000
+
+CMD /usr/bin/xpra start --bind-tcp=0.0.0.0:10000 --html=on --start-child=gtkwave --exit-with-children --daemon=no --xvfb="/usr/bin/Xvfb +extension  Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no --mdns=no
 
