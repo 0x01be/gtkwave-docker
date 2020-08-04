@@ -1,9 +1,6 @@
-FROM alpine:3.12.0 as builder
+FROM 0x01be/alpine:edge as builder
 
-RUN apk add --no-cache --virtual build-dependencies \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+RUN apk add --no-cache --virtual gtkwave-build-dependencies \
     git \
     build-base \
     autoconf \
@@ -29,9 +26,6 @@ FROM 0x01be/xpra
 COPY --from=builder /opt/gtkwave/ /opt/gtkwave/
 
 RUN apk add --no-cache --virtual gtkwave-runtime-dependencies \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
     tcl \
     tk \
     gtk+3.0 \
