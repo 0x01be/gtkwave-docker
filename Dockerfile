@@ -1,4 +1,4 @@
-FROM 0x01be/alpine:edge as builder
+FROM alpine as builder
 
 RUN apk add --no-cache --virtual gtkwave-build-dependencies \
     git \
@@ -11,7 +11,7 @@ RUN apk add --no-cache --virtual gtkwave-build-dependencies \
     xz-dev \
     gtk+3.0-dev
 
-RUN git clone --depth=1 https://github.com/gtkwave/gtkwave /gtkwave
+RUN git clone --depth 1 https://github.com/gtkwave/gtkwave /gtkwave
 
 WORKDIR /gtkwave/gtkwave3-gtk3
 
@@ -36,5 +36,5 @@ ENV PATH $PATH:/opt/gtkwave/bin/
 
 EXPOSE 10000
 
-CMD /usr/bin/xpra start --bind-tcp=0.0.0.0:10000 --html=on --start-child=gtkwave --exit-with-children --daemon=no --xvfb="/usr/bin/Xvfb +extension  Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no --mdns=no
+CMD /usr/bin/xpra start --bind-tcp=0.0.0.0:10000 --html=on --start-child=gtkwave --exit-with-children --daemon=no --xvfb="/usr/bin/Xvfb +extension  Composite -screen 0 1280x726x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no --mdns=no
 
