@@ -26,6 +26,7 @@ FROM 0x01be/xpra
 COPY --from=builder /opt/gtkwave/ /opt/gtkwave/
 
 RUN apk add --no-cache --virtual gtkwave-runtime-dependencies \
+    libstdc++ \
     tcl \
     tk \
     ttf-freefont \
