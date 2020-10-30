@@ -1,4 +1,4 @@
-FROM alpine as builder
+FROM alpine as build
 
 RUN apk add --no-cache --virtual gtkwave-build-dependencies \
     git \
@@ -11,7 +11,8 @@ RUN apk add --no-cache --virtual gtkwave-build-dependencies \
     xz-dev \
     gtk+3.0-dev
 
-RUN git clone --depth 1 https://github.com/gtkwave/gtkwave /gtkwave
+ENV REVISION master
+RUN git clone --depth 1 --branch ${REVISION} https://github.com/gtkwave/gtkwave /gtkwave
 
 WORKDIR /gtkwave/gtkwave3-gtk3
 
@@ -23,19 +24,14 @@ RUN make install
 
 FROM 0x01be/xpra
 
-COPY --from=builder /opt/gtkwave/ /opt/gtkwave/
-
 RUN apk add --no-cache --virtual gtkwave-runtime-dependencies \
     libstdc++ \
     tcl \
-    tk \
-    ttf-freefont \
-    gnome-icon-theme
+    tk 
 
+COPY --from=build /opt/gtkwave/ /opt/gtkwave/
+
+USER xpra
 ENV PATH $PATH:/opt/gtkwave/bin/
-
-VOLUME /workspace
-WORKDIR /workspace
-
-ENV COMMAND "gtkwave"
+ENV COMMAND gtkwave
 
